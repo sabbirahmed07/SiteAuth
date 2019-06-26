@@ -1,0 +1,17 @@
+<div class="masthead">
+  <h3 class="text-muted">Bishudigital Authentication</h3>
+  <nav>
+    <ul class="nav nav-justified">
+      {{#if isAuthenticated}}
+      <li class="active"><a href="/">Home</a></li>
+      <li class="active"><a href="/users/dashboard">Dashboard</a></li>
+      <li class="active"><a href="/users/logout">Log out</a></li>
+      {{else}}
+      <li class="active"><a href="/">Home</a></li>
+      <li><a href="/users/register">Sign Up</a></li>
+      <li><a href="/users/login">Sign In</a></li>
+      {{/if}}
+
+    </ul>
+  </nav>
+</div>
