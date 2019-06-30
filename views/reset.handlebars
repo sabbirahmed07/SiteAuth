@@ -1,0 +1,16 @@
+<form class="form-signin" action="/users/reset/{{userId}}" method="POST">
+  <h2 class="form-signin-heading">Reset Passowrd</h2>
+
+
+  <label for="inputPassword" class="sr-only">Password</label>
+  <input type="password" id="inputPassword" name="password" class="form-control" placeholder="Password" required>
+
+  <label for="inputConfirmPassword" class="sr-only">Confirm Password</label>
+  <input type="password" id="inputConfirmPassword" name="confirmationPassword" class="form-control"
+    placeholder="Confirm Password" required>
+
+
+  <br />
+
+  <button class="btn btn-lg btn-default btn-block" type="submit">Reset Password</button>
+</form>

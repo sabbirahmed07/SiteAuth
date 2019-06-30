@@ -21,6 +21,15 @@ const userSchema = Joi.object().keys({
     .required()
 });
 
+const resetPassSchema = Joi.object().keys({
+  password: Joi.string()
+    .regex(/^[a-zA-Z0-9]{3,30}$/)
+    .required(),
+  confirmationPassword: Joi.any()
+    .valid(Joi.ref("password"))
+    .required()
+});
+
 //Authorization
 const isAuthenticated = (req, res, next) => {
   if (req.isAuthenticated()) {
@@ -157,6 +166,73 @@ router
 
       req.flash("success", "Thank you! now you may login");
       res.redirect("/users/login");
+    } catch (error) {
+      next(error);
+    }
+  });
+
+router
+  .route("/forget")
+  .get((req, res) => {
+    res.render("forget");
+  })
+  .post(async (req, res, next) => {
+    try {
+      //console.log("req.body", req.body.email);
+      const user = await User.findOne({ email: req.body.email });
+      console.log(user);
+
+      if (!user) {
+        req.flash("error", "Email is not found");
+        res.redirect("/users/forget");
+        return;
+      }
+
+      //compose an email
+      const html = `Hi there,
+      <br />
+      Here is the link for your resetting the password :
+      <br />
+      <a href="http://localhost:5000/users/reset/${
+        user.id
+      }\">http://localhost:5000/users/reset/${user.id}</a>`;
+
+      //send the email
+      await mailer.sendEmail(
+        "sabbirsristy@gmail.com",
+        req.body.email,
+        "Please reset your password",
+        html
+      );
+      req.flash("success", "Check your mail");
+    } catch (error) {
+      next(error);
+    }
+  });
+
+router
+  .route("/reset/:userId")
+  .get((req, res) => {
+    res.render("reset", {
+      userId: req.params.userId
+    });
+    //console.log("from get method", req.params.userId);
+  })
+  .post(async (req, res, next) => {
+    try {
+      const { userId } = req.params;
+      const user = await User.findById(userId);
+      console.log("from post user", user);
+
+      const result = Joi.validate(req.body, resetPassSchema);
+      //console.log("result", result);
+
+      const hash = await User.hashPassword(result.value.password);
+      delete result.value.confirmationPassword;
+
+      user.password = hash;
+      await user.save();
+      req.redirect("/users/login");
     } catch (error) {
       next(error);
     }
